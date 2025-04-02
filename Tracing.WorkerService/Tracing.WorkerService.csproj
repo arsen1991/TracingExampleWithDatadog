@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-Tracing.WorkerService-f843b7a0-67a5-4af0-99a3-7cc082a9270d</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Datadog.Trace" Version="3.13.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+    <PackageReference Include="MassTransit" Version="8.0.8" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.8" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Tracing.Shared.Messages\Tracing.Shared.Messages.csproj" />
+    <ProjectReference Include="..\Tracing.Shared.TraceAndLong\Tracing.Shared.TraceAndLong.csproj" />
+  </ItemGroup>
+</Project>

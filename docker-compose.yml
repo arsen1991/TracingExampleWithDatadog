@@ -1,0 +1,69 @@
+version: '3.4'
+
+services:
+  rabbitmq3:
+    hostname: "rabbitmq"
+    image: rabbitmq:3.8-management-alpine
+    environment:
+      - RABBITMQ_DEFAULT_USER=myuser
+      - RABBITMQ_DEFAULT_PASS=mypassword
+    ports:
+    # AMQP protocol port
+      - '5672:5672'
+      # HTTP management UI
+      - '15672:15672'
+    networks:
+      - gateway
+
+  tracing.webaapi:
+    image: tracingwebaapi
+    build:
+      context: .
+      dockerfile: Tracing.WebAapi/Dockerfile
+    ports:
+       - "7010:80"
+    environment:
+       ASPNETCORE_ENVIRONMENT: "Development"
+    depends_on:
+     - "rabbitmq3"
+    networks:
+       - gateway
+
+  tracing.workerservice:
+    image: tracingworkerservice
+    build:
+      context: .
+      dockerfile: Tracing.WorkerService/Dockerfile
+    environment:
+     DOTNET_ENVIRONMENT: "Development"
+    depends_on:
+     - "rabbitmq3" 
+    networks:
+       - gateway
+
+  otel-collector:
+    hostname: "otel" 
+    image: otel/opentelemetry-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4317:4317"   # OTLP gRPC receiver
+    networks:
+       - gateway
+    depends_on:
+     - "jaeger" 
+
+  jaeger:
+    hostname: "jaeger"
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "14250:14250"
+      - "6831:6831/udp"
+      - "16686:16686"
+    networks:
+       - gateway
+
+networks:
+  gateway:
+     
