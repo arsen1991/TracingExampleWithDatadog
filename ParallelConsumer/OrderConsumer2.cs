@@ -1,28 +1,21 @@
 ﻿using Datadog.Trace;
 using MassTransit;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
-using RabbitMQ.Client;
-using System.Linq;
-using System.Reflection.PortableExecutable;
-using System.Text;
 using Tracing.Shared.Messages;
 using static Tracing.Shared.Messages.HeaderParser;
 
-namespace Tracing.WorkerService
+namespace ParallelConsumer
 {
-    public class SubmitOrderConsumer : IConsumer<OrderMessage>
+    public class OrderConsumer2 : IConsumer<OrderMessage>
     {
-        private readonly ILogger<SubmitOrderConsumer> _logger;
+        private readonly ILogger<OrderConsumer2> _logger;
         private readonly IBus _bus;
-
-        public SubmitOrderConsumer(ILogger<SubmitOrderConsumer> logger, IBus bus)
+        public OrderConsumer2(ILogger<OrderConsumer2> logger, IBus bus)
         {
             _logger = logger;
             _bus = bus;
         }
 
-
-        public async Task Consume(ConsumeContext<OrderMessage> context)
+        public Task Consume(ConsumeContext<OrderMessage> context)
         {
             var spanContextExtractor = new SpanContextExtractor();
             var parentContext = spanContextExtractor.Extract(context.Headers.ToDictionary(x => x.Key, y => y.Value), (headers, key) => GetHeaderValues(headers, key));
@@ -30,8 +23,7 @@ namespace Tracing.WorkerService
             using var scope = Tracer.Instance.StartActive("operation", spanCreationSettings);
 
             _logger.LogInformation("Request received.");
-
-            await _bus.Publish(new OrderCompletedMessage() { OrderId = context.Message.OrderId });
+            return Task.CompletedTask;
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Tracing.WebAapi.Controllers
         [HttpPost]
         public async Task<ActionResult> Post()
         {
-            var activity = Activity.Current;
+            //var activity = Activity.Current;
 
             var rc = await _bus.GetSendEndpoint(new Uri($"exchange:{OrderMessage.EndPointAddress}"));
 
